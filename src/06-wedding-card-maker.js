@@ -67,13 +67,81 @@
  *   // => [{ name: "Priya", side: "bride" }]
  */
 export function setupGuestList(containerElement) {
-  // Your code here
+  if (containerElement == null) return null;
+  containerElement.addEventListener("click", e => {
+    const btn = e.target.closest(".remove-btn");
+    if (btn) btn.closest(".guest-item")?.remove();
+  });
+  return {
+    addGuest(name, side) {
+      const div = document.createElement("div");
+      div.className = "guest-item";
+      div.dataset.name = name;
+      div.dataset.side = side;
+      const span = document.createElement("span");
+      span.textContent = name;
+      const btn = document.createElement("button");
+      btn.className = "remove-btn";
+      btn.textContent = "Remove";
+      div.appendChild(span);
+      div.appendChild(btn);
+      containerElement.appendChild(div);
+      return div;
+    },
+    removeGuest(name) {
+      const item = containerElement.querySelector(`.guest-item[data-name="${name}"]`);
+      if (!item) return false;
+      item.remove();
+      return true;
+    },
+    getGuests() {
+      return [...containerElement.querySelectorAll(".guest-item")].map(el => ({
+        name: el.dataset.name,
+        side: el.dataset.side
+      }));
+    }
+  };
 }
 
 export function setupThemeSelector(containerElement, previewElement) {
-  // Your code here
+  if (containerElement == null || previewElement == null) return null;
+  ["traditional", "modern", "royal"].forEach(theme => {
+    const btn = document.createElement("button");
+    btn.className = "theme-btn";
+    btn.textContent = theme;
+    btn.dataset.theme = theme;
+    containerElement.appendChild(btn);
+  });
+  containerElement.addEventListener("click", e => {
+    const btn = e.target.closest(".theme-btn");
+    if (btn) {
+      previewElement.className = btn.dataset.theme;
+      previewElement.dataset.theme = btn.dataset.theme;
+    }
+  });
+  return {
+    getTheme() { return previewElement.dataset.theme || null; }
+  };
 }
 
 export function setupCardEditor(cardElement) {
-  // Your code here
+  if (cardElement == null) return null;
+  cardElement.addEventListener("click", e => {
+    const editing = cardElement.querySelector(".editing");
+    if (editing) {
+      editing.classList.remove("editing");
+      editing.contentEditable = "false";
+    }
+    const target = e.target.closest("[data-editable]");
+    if (target && cardElement.contains(target)) {
+      target.contentEditable = "true";
+      target.classList.add("editing");
+    }
+  });
+  return {
+    getContent(field) {
+      const el = cardElement.querySelector(`[data-editable="${field}"]`);
+      return el ? el.textContent : null;
+    }
+  };
 }

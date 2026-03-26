@@ -79,21 +79,50 @@
  *   // => 1 (only red kites shown)
  */
 export function renderKiteCard(kite) {
-  // Your code here
+  if (!kite || !kite.name || !kite.color || !kite.size || !kite.maker || !kite.image) return null;
+  const div = document.createElement("div");
+  div.className = "kite-card";
+  const img = document.createElement("img");
+  img.src = kite.image; img.alt = kite.name;
+  const h3 = document.createElement("h3");
+  h3.className = "kite-name"; h3.textContent = kite.name;
+  const maker = document.createElement("p");
+  maker.className = "kite-maker"; maker.textContent = `by ${kite.maker}`;
+  const info = document.createElement("p");
+  info.className = "kite-info"; info.textContent = `${kite.size} - ${kite.color}`;
+  div.append(img, h3, maker, info);
+  return div;
 }
 
 export function renderGallery(container, kites) {
-  // Your code here
+  if (container == null || !Array.isArray(kites)) return -1;
+  container.innerHTML = "";
+  let count = 0;
+  kites.forEach(k => { const card = renderKiteCard(k); if (card) { container.appendChild(card); count++; } });
+  return count;
 }
 
 export function filterKites(container, kites, filterFn) {
-  // Your code here
+  if (container == null) return -1;
+  if (!Array.isArray(kites) || typeof filterFn !== "function") return -1;
+  return renderGallery(container, kites.filter(filterFn));
 }
 
-export function sortAndRender(container, kites, sortField, order) {
-  // Your code here
+export function sortAndRender(container, kites, sortField, order = "asc") {
+  if (container == null || !Array.isArray(kites)) return [];
+  const sorted = [...kites].sort((a, b) => {
+    const av = a[sortField] ?? "", bv = b[sortField] ?? "";
+    return order === "desc" ? (bv > av ? 1 : -1) : (av > bv ? 1 : -1);
+  });
+  renderGallery(container, sorted);
+  return sorted;
 }
 
 export function renderEmptyState(container, message) {
-  // Your code here
+  if (container == null) return false;
+  if (container.children.length > 0) return false;
+  const p = document.createElement("p");
+  p.className = "empty-state"; p.textContent = message;
+  container.appendChild(p);
+  return true;
 }
